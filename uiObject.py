@@ -12,8 +12,7 @@ class uiObject:
             print(self.jsonData)
         else:
             print('no')
-
-
+            
 
     def thread_it(self, func, *args):
         '''
