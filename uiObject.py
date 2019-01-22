@@ -14,6 +14,7 @@ class uiObject:
             print('no')
 
 
+
     def thread_it(self, func, *args):
         '''
         将函数打包进线程
