@@ -36,6 +36,7 @@ movieData = ' [' \
             ' {"title":"黑色电影", "type":"31", "interval_id":"100:90"}' \
             ']'
 
+
 class getMovieInRankingList:
     
 
