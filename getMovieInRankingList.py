@@ -1,6 +1,7 @@
 import urllib.request
 import ssl
 import json
+import requests
 
 
 movieData = ' [' \
@@ -48,7 +49,11 @@ class getMovieInRankingList:
     # 从排行榜中获取电影数据
     def getUrlDataInRankingList(self):
         context = ssl._create_unverified_context() #ssl
-        f = urllib.request.urlopen('https://movie.douban.com/j/chart/top_list?type=' + str(self.typeId) + '&interval_id=100:90&action=unwatched&start=0&limit=' + str(self.movie_count), context=context)
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+                      "Cookie":"bid=GOT4pCp9nDo; douban-fav-remind=1; ll=\"118281\"; _vwo_uuid_v2=D66FD66C128357F50256AF7D1640C2C4E|cfa1775f07bb9e7b103867cca686f90f; ct=y; push_noty_num=0; push_doumail_num=0; __utmv=30149280.17530; ps=y; dbcl2=\"175306983:IdbYxDP86ig\"; gr_user_id=114cc107-0ac5-4673-b200-31dd9a75055f; __yadk_uid=XB4UiG1j51gcqU0eP9Kixoh7Md13Iuh3; ck=C2_e; __utmc=30149280; __utmc=223695111; __utmz=223695111.1548048334.17.5.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; __utma=30149280.1293355995.1546000996.1548232182.1548236480.32; __utmz=30149280.1548236480.32.16.utmcsr=sec.douban.com|utmccn=(referral)|utmcmd=referral|utmcct=/a; _pk_ref.100001.4cf6=%5B%22%22%2C%22%22%2C1548236776%2C%22https%3A%2F%2Fwww.baidu.com%2Flink%3Furl%3DamwH-XLMWrZif3MaPJ9II4CtZIM6A0xUPdB8UQKMadjqHZApcjKbViUzRtAqqYVRHkXKXw9YmL7INCYr3D4ONa%26wd%3D%26eqid%3Daafd0df100043c14000000065c4557c7%22%5D; _pk_id.100001.4cf6=a5fe3116fc29e5fa.1546939070.23.1548236776.1548232454.; __utma=223695111.1446768112.1546939070.1548232182.1548236776.21"}
+        url = 'https://movie.douban.com/j/chart/top_list?type=' + str(self.typeId) + '&interval_id=100:90&action=unwatched&start=0&limit=' + str(self.movie_count)
+        req = urllib.request.Request(url=url, headers=headers)
+        f = urllib.request.urlopen(req, context=context)
         response=f.read()
         jsonData = json.loads(response) #转化为json数据
 
