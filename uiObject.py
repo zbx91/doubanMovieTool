@@ -143,7 +143,6 @@ class uiObject:
         self.label_img.image = img
 
 
-
     def center_window(self, root, w, h):
         """
         窗口居于屏幕中央
@@ -242,7 +241,7 @@ class uiObject:
 
         #电影搜索布局开始
         # 容器控件
-        labelframe = LabelFrame(root, width=660, height=270, text="搜索电影")
+        labelframe = LabelFrame(root, width=660, height=270, text="从排行榜搜索电影")
         labelframe.place(x=5, y=5)
         self.labelframe = labelframe
 
