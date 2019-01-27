@@ -1,8 +1,26 @@
 import urllib.request
+import urllib.parse
 import ssl
 import json
-import requests
+from selenium import webdriver
 
+# {
+# 	"rating": ["8.0", "40"],
+# 	"rank": 13,
+# 	"cover_url": "https://img3.doubanio.com\/view\/photo\/s_ratio_poster\/public\/p453518655.webp",
+# 	"is_playable": true,
+# 	"id": "1293013",
+# 	"types": ["动作", "科幻", "冒险", "灾难"],
+# 	"regions": ["美国"],
+# 	"title": "独立日",
+# 	"url": "https:\/\/movie.douban.com\/subject\/1293013\/",
+# 	"release_date": "1996-07-02",
+# 	"actor_count": 49,
+# 	"vote_count": 165068,
+# 	"score": "8.0",
+# 	"actors": ["威尔·史密斯", "比尔·普尔曼", "杰夫·高布伦", "玛丽·麦克唐纳", "贾德·赫希", "罗伯特·劳吉亚", "兰迪·奎德", "玛格丽特·柯林", "薇薇卡·福克斯", "詹姆斯·瑞布霍恩", "哈维·费斯特恩", "亚当·鲍德温", "布伦特·斯皮内", "詹姆斯·杜瓦尔", "莉萨·雅克布", "杰赛普·安德鲁斯", "罗斯·巴格利", "比尔·斯米托洛维奇", "梅·惠特曼", "小哈里·康尼克", "绮尔斯腾·瓦伦", "约翰·斯托里", "弗兰克·诺瓦克", "德文·古梅尔萨尔", "吉姆·皮多克", "克里斯托弗·康纳德", "格雷格·科林斯", "罗伯特·派恩", "巴里·德尔·舍曼", "珍娜·马瑞·霍普", "维恩·维尔德森", "约翰·贝内特·派瑞", "卡洛斯·拉卡马拉", "丹·劳里亚", "Anthony Crivello", "小理察·斯贝特", "皮特·J.卢卡斯", "鲍比·霍希", "安德鲁·凯加", "金伯莉·贝克", "Adam Tomei", "兰斯·霍华德", "拉法埃尔·沙巴拉格", "勒兰德·奥瑟", "Darla Rae", "Jon Matthews", "Daren Dochterman", "杰·阿克沃内", "Gary A. Hecker"],
+# 	"is_watched": false
+# }
 
 movieData = ' [' \
             '{"title":"纪录片", "type":"1", "interval_id":"100:90"}, ' \
@@ -41,26 +59,23 @@ class getMovieInRankingList:
     
 
     # typeId 电影类型, movie_count 欲获取的该电影类型的数量, rating 电影的评分, vote_count 电影的评价人数
-    def __init__(self, typeId, movie_count, rating, vote_count):
-        self.typeId = typeId
-        self.movie_count = movie_count
-        self.rating = rating
-        self.vote_count = vote_count
+    def __init__(self):
+        pass
 
     # 从排行榜中获取电影数据
-    def getUrlDataInRankingList(self):
+    def get_url_data_in_ranking_list(self, typeId, movie_count, rating, vote_count):
         context = ssl._create_unverified_context() #ssl
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
                       "Cookie":"bid=GOT4pCp9nDo; douban-fav-remind=1; ll=\"118281\"; _vwo_uuid_v2=D66FD66C128357F50256AF7D1640C2C4E|cfa1775f07bb9e7b103867cca686f90f; ct=y; push_noty_num=0; push_doumail_num=0; __utmv=30149280.17530; ps=y; dbcl2=\"175306983:IdbYxDP86ig\"; gr_user_id=114cc107-0ac5-4673-b200-31dd9a75055f; __yadk_uid=XB4UiG1j51gcqU0eP9Kixoh7Md13Iuh3; ck=C2_e; __utmc=30149280; __utmc=223695111; __utmz=223695111.1548048334.17.5.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; __utma=30149280.1293355995.1546000996.1548232182.1548236480.32; __utmz=30149280.1548236480.32.16.utmcsr=sec.douban.com|utmccn=(referral)|utmcmd=referral|utmcct=/a; _pk_ref.100001.4cf6=%5B%22%22%2C%22%22%2C1548236776%2C%22https%3A%2F%2Fwww.baidu.com%2Flink%3Furl%3DamwH-XLMWrZif3MaPJ9II4CtZIM6A0xUPdB8UQKMadjqHZApcjKbViUzRtAqqYVRHkXKXw9YmL7INCYr3D4ONa%26wd%3D%26eqid%3Daafd0df100043c14000000065c4557c7%22%5D; _pk_id.100001.4cf6=a5fe3116fc29e5fa.1546939070.23.1548236776.1548232454.; __utma=223695111.1446768112.1546939070.1548232182.1548236776.21"}
-        url = 'https://movie.douban.com/j/chart/top_list?type=' + str(self.typeId) + '&interval_id=100:90&action=unwatched&start=0&limit=' + str(self.movie_count)
+        url = 'https://movie.douban.com/j/chart/top_list?type=' + str(typeId) + '&interval_id=100:90&action=unwatched&start=0&limit=' + str(movie_count)
         req = urllib.request.Request(url=url, headers=headers)
         f = urllib.request.urlopen(req, context=context)
         response=f.read()
-        jsonData = json.loads(response) #转化为json数据
+        jsonData = json.loads(response) #将json转为python对象
 
         list = []
         for subData in jsonData: #依次对每部电影进行操作
-            if((float(subData['rating'][0]) >= float(self.rating)) and (float(subData['vote_count']) >= float(self.vote_count))):
+            if((float(subData['rating'][0]) >= float(rating)) and (float(subData['vote_count']) >= float(vote_count))):
                 subList = []
                 subList.append(subData['title'])
                 subList.append(subData['rating'][0])
@@ -69,5 +84,75 @@ class getMovieInRankingList:
                 list.append(subList)
 
         return list,jsonData
+
+
+
+    # 从关键字获取电影数据
+    def get_url_data_in_keyWord(self,key_word):
+
+        # 使用selenium和phantomjs抓取js动态渲染的界面数据
+        # selenium:Web自动化程序工具,安装方式pip install selenium==2.48.0
+        # 注意selenium必须安装2.x版本,否则报错,新版selenium已经放弃phantomjs
+        # phantomjs:一款无界面的浏览器内核，下载方式http://phantomjs.org/download.html
+        # 此方式优点:可爬取js动态渲染后的数据,缺点:速度较低,效率一般
+
+        service_args = []
+        service_args.append('--load-images=no') # 关闭图片加载
+        service_args.append('--disk-cache=yes') # 开启缓存
+        service_args.append('--ignore-ssl-errors=true') # 忽略https错误
+        driver = webdriver.PhantomJS(executable_path='phantomjs-2.1.1-macosx/bin/phantomjs', service_args=service_args)  # 里面的路径即为phantomjs.exe的路径
+        driver.get('https://movie.douban.com/subject_search?search_text=' + urllib.parse.quote(key_word) + '&cat=1002')  # get方式获取返回数据
+
+
+        dr = driver.find_elements_by_xpath("//div[@class='item-root']")  # 获取class为item-root的DIV(因为有多个结果)
+        jsonData = []
+        list = []
+        for son in dr:
+            movieData = {'rating': ['', 'null'], 'cover_url': '', 'types': '', 'title': '', 'url': '', 'release_date': '', 'vote_count': '', 'actors': ''}
+            subList = ['','','','']
+
+            url_element = son.find_elements_by_xpath(".//a")  # 获取第一个a标签的url(因为有多个结果)
+            if (url_element):
+                movieData['url'] = (url_element[0].get_attribute("href"))
+
+            img_url_element = url_element[0].find_elements_by_xpath(".//img")  # 获取影片海报图片地址
+            if (img_url_element):
+                movieData['cover_url'] = (img_url_element[0].get_attribute("src"))
+
+            title_element = son.find_elements_by_xpath(".//div[@class='title']")  # 获取标题
+            if (title_element):
+                temp_title = (title_element[0].text)
+                movieData['title'] = (temp_title.split('('))[0]
+                movieData['release_date'] = temp_title[temp_title.find('(')+1:temp_title.find(')')]
+                subList[0] = movieData['title']
+
+            rating_element = son.find_elements_by_xpath(".//span[@class='rating_nums']")  # 获取评分
+            if (rating_element):
+                movieData['rating'][0] = (rating_element[0].text)
+                subList[1] = movieData['rating'][0]
+
+            vote_element = son.find_elements_by_xpath(".//span[@class='pl']")  # 获取数量
+            if (vote_element):
+                movieData['vote_count'] = (vote_element[0].text).replace('(','').replace(')','').replace('人评价','')
+                subList[3] = movieData['vote_count']
+
+            type_element = son.find_elements_by_xpath(".//div[@class='meta abstract']")  # 获取类型
+            if (type_element):
+                movieData['types'] = (type_element[0].text)
+                subList[2] = movieData['types']
+
+            actors_element = son.find_elements_by_xpath(".//div[@class='meta abstract_2']")  # 获取演员
+            if (actors_element):
+                movieData['actors'] = (actors_element[0].text)
+
+            jsonData.append(movieData)
+            list.append(subList)
+
+
+        driver.quit()
+        return list,jsonData
+
+
+
 
 
