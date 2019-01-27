@@ -103,7 +103,6 @@ class getMovieInRankingList:
         driver = webdriver.PhantomJS(executable_path='phantomjs-2.1.1-macosx/bin/phantomjs', service_args=service_args)  # 里面的路径即为phantomjs.exe的路径
         driver.get('https://movie.douban.com/subject_search?search_text=' + urllib.parse.quote(key_word) + '&cat=1002')  # get方式获取返回数据
 
-
         dr = driver.find_elements_by_xpath("//div[@class='item-root']")  # 获取class为item-root的DIV(因为有多个结果)
         jsonData = []
         list = []

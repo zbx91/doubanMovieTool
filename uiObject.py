@@ -116,7 +116,7 @@ class uiObject:
 
 
 
-    def show_movie_data_in_rating(self, event):
+    def show_movie_data(self, event):
         '''
         显示某个被选择的电影的详情信息
         '''
@@ -133,44 +133,19 @@ class uiObject:
                     file_name = save_img(img_url, movie_name, 'img') #下载网络图片
                     self.show_movie_img(file_name)
                     self.label_movie_name.config(text=movie['title'])
-                    string_actors = "、".join(movie['actors'])
+                    if(isinstance(movie['actors'],list)):
+                        string_actors = "、".join(movie['actors'])
+                    else:
+                        string_actors = movie['actors']
                     self.label_movie_actor.config(text=string_actors)
                     self.label_movie_rating.config(text=str(movie['rating'][0]) + '分 ' + str(movie['vote_count']) + '人评价')
                     self.label_movie_time.config(text=movie['release_date'])
                     self.label_movie_type.config(text=movie['types'])
+                    print(movie)
                     break
 
         # self.show_GUI_movie_detail()
 
-
-
-
-
-    def show_movie_data_in_keyword(self, event):
-        '''
-        显示某个被选择的电影的详情信息
-        '''
-
-        # self.hidden_GUI_movie_detail()
-        item = self.treeview_keyword.selection()
-        if(item):
-            item_text = self.treeview_keyword.item(item, "values")
-            movieName = item_text[0] # 输出电影名
-            for movie in self.jsonData_keyword:
-                if(movie['title'] == movieName):
-                    img_url = movie['cover_url']
-                    movie_name = movie['title']
-                    file_name = save_img(img_url, movie_name, 'img') #下载网络图片
-                    self.show_movie_img(file_name)
-                    self.label_movie_name.config(text=movie['title'])
-                    string_actors = "、".join(movie['actors'])
-                    self.label_movie_actor.config(text=string_actors)
-                    self.label_movie_rating.config(text=str(movie['rating'][0]) + '分 ' + str(movie['vote_count']) + '人评价')
-                    self.label_movie_time.config(text=movie['release_date'])
-                    self.label_movie_type.config(text=movie['types'])
-                    break
-
-        # self.show_GUI_movie_detail()
 
 
 
@@ -183,7 +158,7 @@ class uiObject:
         :return:
         '''
         img_open = Image.open(file_name) #读取本地图片
-        pil_image_resized = resize(160, 250, img_open) #等比例缩放本地图片
+        pil_image_resized = resize(160, 200, img_open) #等比例缩放本地图片
         img = ImageTk.PhotoImage(pil_image_resized) #读入图片
         self.label_img.config(image=img, width = pil_image_resized.size[0], height = pil_image_resized.size[1])
         self.label_img.image = img
@@ -240,7 +215,9 @@ class uiObject:
         self.T_count['state'] = tkinter.DISABLED
         self.T_rating['state'] = tkinter.DISABLED
         self.T_vote['state'] = tkinter.DISABLED
-        self.B_0['text'] = '正在查询'
+        self.B_0_keyword['state'] = tkinter.DISABLED
+        self.T_vote_keyword['state'] = tkinter.DISABLED
+        self.B_0['text'] = '正在努力搜索'
         self.jsonData = ""
 
 
@@ -260,7 +237,9 @@ class uiObject:
         self.T_count['state'] = tkinter.NORMAL
         self.T_rating['state'] = tkinter.NORMAL
         self.T_vote['state'] = tkinter.NORMAL
-        self.B_0['text'] = '查询影片'
+        self.B_0_keyword['state'] = tkinter.NORMAL
+        self.T_vote_keyword['state'] = tkinter.NORMAL
+        self.B_0['text'] = '从排行榜搜索'
 
 
 
@@ -270,26 +249,36 @@ class uiObject:
         从关键字中搜索符合条件的影片信息
         """
         # 按钮设置为灰色状态
-        self.clear_tree(self.treeview_keyword)  # 清空表格
+        self.clear_tree(self.treeview)  # 清空表格
+        self.B_0['state'] = tkinter.DISABLED
+        self.C_type['state'] = tkinter.DISABLED
+        self.T_count['state'] = tkinter.DISABLED
+        self.T_rating['state'] = tkinter.DISABLED
+        self.T_vote['state'] = tkinter.DISABLED
         self.B_0_keyword['state'] = tkinter.DISABLED
         self.T_vote_keyword['state'] = tkinter.DISABLED
-        self.B_0_keyword['text'] = '正在查询'
-        self.jsonData_keyword = ""
+        self.B_0_keyword['text'] = '正在努力搜索'
+        self.jsonData = ""
 
 
 
 
         movieObject = getMovieInRankingList(); #创建对象
-        list,jsonData_keyword = movieObject.get_url_data_in_keyWord(self.T_vote_keyword.get())
-        self.jsonData_keyword = jsonData_keyword
-        self.add_tree(list, self.treeview_keyword) # 将数据添加到tree中
+        list,jsonData = movieObject.get_url_data_in_keyWord(self.T_vote_keyword.get())
+        self.jsonData = jsonData
+        self.add_tree(list, self.treeview) # 将数据添加到tree中
 
 
 
         # 按钮设置为正常状态
+        self.B_0['state'] = tkinter.NORMAL
+        self.C_type['state'] = 'readonly'
+        self.T_count['state'] = tkinter.NORMAL
+        self.T_rating['state'] = tkinter.NORMAL
+        self.T_vote['state'] = tkinter.NORMAL
         self.B_0_keyword['state'] = tkinter.NORMAL
         self.T_vote_keyword['state'] = tkinter.NORMAL
-        self.B_0_keyword['text'] = '查询影片'
+        self.B_0_keyword['text'] = '从关键字搜索'
 
 
     def ui_process(self):
@@ -308,7 +297,7 @@ class uiObject:
 
         # 从排行榜 电影搜索布局开始
         # 容器控件
-        labelframe = LabelFrame(root, width=660, height=270, text="从排行榜搜索电影")
+        labelframe = LabelFrame(root, width=660, height=300, text="搜索电影")
         labelframe.place(x=5, y=5)
         self.labelframe = labelframe
 
@@ -373,8 +362,8 @@ class uiObject:
         # 查询按钮
         #lambda表示绑定的函数需要带参数，请勿删除lambda，否则会出现异常
         #thread_it表示新开启一个线程执行这个函数，防止GUI界面假死无响应
-        B_0 = Button(labelframe, text="查询影片")
-        B_0.place(x=580, y=10)
+        B_0 = Button(labelframe, text="从排行榜搜索")
+        B_0.place(x=560, y=10)
         self.B_0 = B_0
 
 
@@ -416,7 +405,8 @@ class uiObject:
         # 框架的位置布局
         frame_l.grid(row=0, column=0, sticky=NSEW)
         frame_r.grid(row=0, column=1, sticky=NS)
-        frame_root.place(x=5, y=40)
+        frame_root.place(x=5, y=70)
+
         # 从排行榜 电影搜索布局结束
 
 
@@ -429,71 +419,28 @@ class uiObject:
 
 
         # 输入关键字 电影搜索布局开始
-        # 容器控件
-        labelframe_keyword = LabelFrame(root, width=660, height=270, text="从关键字搜索电影")
-        labelframe_keyword.place(x=5, y=280)
-        self.labelframe_keyword = labelframe_keyword
 
-
-        # 评价人数
-        L_vote_keyword = Label(labelframe_keyword, text='请输入影片名称')
-        L_vote_keyword.place(x=0, y=10)
+        # 影片名称
+        L_vote_keyword = Label(labelframe, text='影片名称')
+        L_vote_keyword.place(x=0, y=40)
         #L_vote_keyword.grid(row=0,column=0)
         self.L_vote_keyword = L_vote_keyword
 
         # 文本框
-        T_vote_keyword = Entry(labelframe_keyword, width=50)
+        T_vote_keyword = Entry(labelframe, width=53)
         T_vote_keyword.delete(0, END)
         T_vote_keyword.insert(0, '我不是药神')
-        T_vote_keyword.place(x=100, y=7)
+        T_vote_keyword.place(x=66, y=37)
         self.T_vote_keyword = T_vote_keyword
 
 
         # 查询按钮
         #lambda表示绑定的函数需要带参数，请勿删除lambda，否则会出现异常
         #thread_it表示新开启一个线程执行这个函数，防止GUI界面假死无响应
-        B_0_keyword = Button(labelframe_keyword, text="查询影片")
-        B_0_keyword.place(x=580, y=10)
+        B_0_keyword = Button(labelframe, text="从关键字搜索")
+        B_0_keyword.place(x=560, y=40)
         self.B_0_keyword = B_0_keyword
 
-
-        # 框架布局，承载多个控件
-        frame_root_keyword = Frame(labelframe_keyword, width=400)
-        frame_l_keyword = Frame(frame_root_keyword)
-        frame_r_keyword = Frame(frame_root_keyword)
-        self.frame_root_keyword = frame_root_keyword
-        self.frame_l_keyword = frame_l_keyword
-        self.frame_r_keyword = frame_r_keyword
-
-
-        # 表格
-        columns_keyword = ("影片名字", "影片评分", "影片类型", "评价人数")
-        treeview_keyword = ttk.Treeview(frame_l_keyword, height=10, show="headings", columns=columns_keyword)
-
-        treeview_keyword.column("影片名字", width=210, anchor='center')  # 表示列,不显示
-        treeview_keyword.column("影片评分", width=210, anchor='center')
-        treeview_keyword.column("影片类型", width=100, anchor='center')
-        treeview_keyword.column("评价人数", width=100, anchor='center')
-
-        treeview_keyword.heading("影片名字", text="影片名字")  # 显示表头
-        treeview_keyword.heading("影片评分", text="影片评分")
-        treeview_keyword.heading("影片类型", text="影片类型")
-        treeview_keyword.heading("评价人数", text="评价人数")
-
-
-        #垂直滚动条
-        vbar_keyword = ttk.Scrollbar(frame_r_keyword, command=treeview_keyword.yview)
-        treeview_keyword.configure(yscrollcommand=vbar_keyword.set)
-
-        treeview_keyword.pack()
-        self.treeview_keyword = treeview_keyword
-        vbar_keyword.pack(side=RIGHT, fill=Y)
-        self.vbar_keyword = vbar_keyword
-
-        # 框架的位置布局
-        frame_l_keyword.grid(row=0, column=0, sticky=NSEW)
-        frame_r_keyword.grid(row=0, column=1, sticky=NS)
-        frame_root_keyword.place(x=5, y=40)
         # 输入关键字 电影搜索布局结束
 
 
@@ -513,12 +460,12 @@ class uiObject:
 
 
         # 框架布局，承载多个控件
-        frame_left_movie_detail = Frame(labelframe_movie_detail, width=160,height=250)
+        frame_left_movie_detail = Frame(labelframe_movie_detail, width=160,height=280)
         frame_left_movie_detail.grid(row=0, column=0)
         self.frame_left_movie_detail = frame_left_movie_detail
 
 
-        frame_right_movie_detail = Frame(labelframe_movie_detail, width=160,height=250)
+        frame_right_movie_detail = Frame(labelframe_movie_detail, width=160,height=280)
         frame_right_movie_detail.grid(row=0, column=1)
         self.frame_right_movie_detail = frame_right_movie_detail
 
@@ -556,16 +503,20 @@ class uiObject:
         label_movie_actor = Label(frame_right_movie_detail, text="影片演员", wraplength=135, justify = 'left', anchor=NW)
         label_movie_actor.place(x=0, y=120)
         self.label_movie_actor = label_movie_actor
+
         # 电影详情布局结束
 
 
 
 
+
+
+
         #绑定事件
-        treeview.bind('<<TreeviewSelect>>', self.show_movie_data_in_rating)  # 表格绑定选择事件
+        treeview.bind('<<TreeviewSelect>>', self.show_movie_data)  # 表格绑定选择事件
         B_0.configure(command=lambda:thread_it(self.searh_movie_in_rating)) #按钮绑定单击事件
-        treeview_keyword.bind('<<TreeviewSelect>>', self.show_movie_data_in_keyword)  # 表格绑定选择事件
         B_0_keyword.configure(command=lambda:thread_it(self.searh_movie_in_keyword)) #按钮绑定单击事件
+
 
 
         root.mainloop()
