@@ -8,6 +8,11 @@ from PIL import Image, ImageTk
 import threading
 import os
 import ssl
+import webbrowser
+from urllib.parse import quote
+from re import compile
+from re import findall
+
 ssl._create_default_https_context = ssl._create_unverified_context #关闭SSL证书验证
 
 
@@ -83,6 +88,13 @@ def resize(w_box, h_box, pil_image):
     return pil_image.resize((width, height), Image.ANTIALIAS)
 
 
+def get_mid_str(content,startStr,endStr):
+    startIndex = content.index(startStr)
+    if startIndex>=0:
+        startIndex += len(startStr)
+    endIndex = content.index(endStr)
+    return content[startIndex:endIndex]
+
 
 class uiObject:
 
@@ -116,12 +128,164 @@ class uiObject:
 
 
 
+    def show_IDMB_rating(self):
+        '''
+        显示IDM评分
+        '''
+
+        self.label_movie_rating_imdb.config(text='正在加载IMDB评分')
+        self.B_0_imdb['state'] = tkinter.DISABLED
+        rating_imdb = '未知'
+
+
+
+        item = self.treeview.selection()
+        if(item):
+            item_text = self.treeview.item(item, "values")
+            movieName = item_text[0] # 输出电影名
+            for movie in self.jsonData:
+                if(movie['title'] == movieName):
+
+                    f = urllib.request.urlopen(movie['url'])
+                    response = (f.read()).decode()
+                    url_imdb = get_mid_str(response, 'IMDb链接:</span> <a href=\"', '\" target=\"_blank\" rel=\"nofollow\">')
+
+                    f = urllib.request.urlopen(url_imdb)
+                    data_imdb = (f.read()).decode()
+                    rating_imdb = get_mid_str(data_imdb, '<span class=\"rating">', '<span class=\"ofTen\">')
+
+
+
+
+
+
+
+                    self.clear_tree(self.treeview_play_online)
+                    s = response
+                    name = re.findall(r"<a class=\"playBtn\" data-cn=\"(.*?)\" href=\"", s)
+                    down_url = re.findall(r"data-cn=\".*?\" href=\"(.*?)\" target=", s)
+                    real_movie_name = get_mid_str(s, "<title>", "</title>").replace(" ","").replace("\n","").replace("(豆瓣)","")
+                    print(real_movie_name)
+                    list = []
+                    for i in range(len(name)):
+                        list.append([name[i], "限VIP免费", down_url[i]])
+                    list.append(["4K屋", "免费", "http://www.4kwu.cc/?m=vod-search&wd=" + quote(real_movie_name)])
+                    list.append(["91黑米", "免费", "http://www.91heimi.com/index.php/vod/search.html?wd=" + quote(real_movie_name)])
+                    list.append(["AAQQS", "免费", "http://aaxxy.com/vod-search-pg-1-wd-" + quote(real_movie_name) + ".html"])
+                    list.append(["Neets", "免费", "http://neets.cc/search?key=" + quote(real_movie_name)])
+                    list.append(["Q2电影网", "免费", "http://www.q2002.com/search?wd=" + quote(real_movie_name)])
+                    list.append(["霸气村", "免费", "http://www.baqicun.co/search.php?searchword=" + quote(real_movie_name)])
+                    list.append(["魔力电影网", "免费", "http://www.magbt.net/search.php?searchword=" + quote(real_movie_name)])
+                    list.append(["新论语", "免费", "http://www.honggujiu.net/index.php?m=vod-search&wd=" + quote(real_movie_name)])
+                    list.append(["左手吃斋", "免费", "https://www.xiangkanju.com/index.php?m=vod-search&wd=" + quote(real_movie_name)])
+                    self.add_tree(list, self.treeview_play_online)
+
+
+
+
+
+
+
+
+
+
+
+                    self.clear_tree(self.treeview_save_cloud_disk)
+                    list = []
+                    list.append(["56网盘搜索", "有效", "https://www.56wangpan.com/search/o2kw" + quote(real_movie_name)])
+                    list.append(["爱搜资源", "有效", "https://www.aisouziyuan.com/?name=" + quote(real_movie_name) + "&page=1"])
+                    list.append(["盘多多", "有效", "http://www.panduoduo.net/s/comb/n-" + quote(real_movie_name) + "&f-f4"])
+                    list.append(["小白盘", "有效", "https://www.xiaobaipan.com/list-" + quote(real_movie_name) + "-1.html" ])
+                    list.append(["云盘精灵", "有效", "https://www.yunpanjingling.com/search/" + quote(real_movie_name) + "?sort=size.desc"])
+                    self.add_tree(list, self.treeview_save_cloud_disk)
+
+
+
+
+
+
+                    self.clear_tree(self.treeview_bt_download)
+                    list = []
+                    list.append(  ['19影视', '有效', 'https://www.19kan.com/vodsearch.html?wd=' + quote(real_movie_name)  ])
+                    list.append(  ['2TU影院', '有效', 'http://www.82tu.cc/search.php?submit=%E6%90%9C+%E7%B4%A2&searchword=' + quote(real_movie_name)  ])
+                    list.append(  ['4K电影', '有效', 'https://www.dygc.org/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['52 Movie', '有效', 'http://www.52movieba.com/search.htm?keyword=' + quote(real_movie_name)  ])
+                    list.append(  ['592美剧', '有效', 'http://www.592meiju.com/search/?wd=' + quote(real_movie_name)  ])
+                    list.append(  ['97电影网', '有效', 'http://www.55xia.com/search?q=' + quote(real_movie_name)  ])
+                    list.append(  ['98TVS', '有效', 'http://www.98tvs.com/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['9去这里', '有效', 'http://9qzl.com/index.php?s=/video/search/wd/' + quote(real_movie_name)  ])
+                    list.append(  ['CK电影', '有效', 'http://www.ck180.net/search.html?q=' + quote(real_movie_name)  ])
+                    list.append(  ['LOL电影', '有效', 'http://www.993dy.com/index.php?m=vod-search&wd=' + quote(real_movie_name)  ])
+                    list.append(  ['MP4Vv', '有效', 'http://www.mp4pa.com/search.php?searchword=' + quote(real_movie_name)  ])
+                    list.append(  ['MP4电影', '有效', 'http://www.domp4.com/search/' + quote(real_movie_name)   + '-1.html'])
+                    list.append(  ['TL95', '有效', 'http://www.tl95.com/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['比特大雄', '有效', 'https://www.btdx8.com/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['比特影视', '有效', 'https://www.bteye.com/search/' + quote(real_movie_name)  ])
+                    list.append(  ['春晓影视', '有效', 'http://search.chunxiao.tv/?keyword=' + quote(real_movie_name)  ])
+                    list.append(  ['第一电影网', '有效', 'https://www.001d.com/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['电影日志', '有效', 'http://www.dyrizhi.com/search?s=' + quote(real_movie_name)  ])
+                    list.append(  ['高清888', '有效', 'https://www.gaoqing888.com/search?kw=' + quote(real_movie_name)  ])
+                    list.append(  ['高清MP4', '有效', 'http://www.mp4ba.com/index.php?m=vod-search&wd=' + quote(real_movie_name)  ])
+                    list.append(  ['高清电台', '有效', 'https://gaoqing.fm/s.php?q=' + quote(real_movie_name)  ])
+                    list.append(  ['高清控', '有效', 'http://www.gaoqingkong.com/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['界绍部', '有效', 'http://www.jsb456.com/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['看美剧', '有效', 'http://www.kanmeiju.net/index.php?s=/video/search/wd/' + quote(real_movie_name)  ])
+                    list.append(  ['蓝光网', '有效', 'http://www.languang.co/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['老司机电影', '有效', 'http://www.lsjdyw.net/search/?s=' + quote(real_movie_name)  ])
+                    list.append(  ["乐赏电影", '有效', 'http://www.gscq.me/search.htm?keyword=' + quote(real_movie_name)  ])
+                    list.append(  ["美剧汇", '有效', 'http://www.meijuhui.net/search.php?q=' + quote(real_movie_name)  ])
+                    list.append(  ['美剧鸟', '有效', 'http://www.meijuniao.com/index.php?s=vod-search-wd-' + quote(real_movie_name)  ])
+                    list.append(  ['迷你MP4', '有效', 'http://www.minimp4.com/search?q=' + quote(real_movie_name)  ])
+                    list.append(  ['泡饭影视', '有效', 'http://www.chapaofan.com/search/' + quote(real_movie_name)  ])
+                    list.append(  ['片吧', '有效', 'http://so.pianbar.com/search.aspx?q=' + quote(real_movie_name)  ])
+                    list.append(  ['片源网', '有效', 'http://pianyuan.net/search?q=' + quote(real_movie_name)  ])
+                    list.append(  ['飘花资源网', '有效', 'https://www.piaohua.com/plus/search.php?kwtype=0&keyword=' + quote(real_movie_name)  ])
+                    list.append(  ['趣味源', '有效', 'http://quweiyuan.cc/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['人生05', '有效', 'http://www.rs05.com/search.php?s=' + quote(real_movie_name)  ])
+                    list.append(  ['贪玩影视', '有效', 'http://www.tanwanyingshi.com/movie/search?keyword=' + quote(real_movie_name)  ])
+                    list.append(  ['新片网', '有效', 'http://www.91xinpian.com/index.php?m=vod-search&wd=' + quote(real_movie_name)  ])
+                    list.append(  ['迅雷影天堂', '有效', 'https://www.xl720.com/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['迅影网', '有效', 'http://www.xunyingwang.com/search?q=' + quote(real_movie_name)  ])
+                    list.append(  ['一只大榴莲', '有效', 'http://www.llduang.com/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['音范丝', '有效', 'http://www.yinfans.com/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['影海', '有效', 'http://www.yinghub.com/search/list.html?keyword=' + quote(real_movie_name)  ])
+                    list.append(  ['影视看看', '有效', 'http://www.yskk.tv/index.php?m=vod-search&wd=' + quote(real_movie_name)  ])
+                    list.append(  ['云播网', '有效', 'http://www.yunbowang.cn/index.php?m=vod-search&wd=' + quote(real_movie_name)  ])
+                    list.append(  ['中国高清网', '有效', 'http://gaoqing.la/?s=' + quote(real_movie_name)  ])
+                    list.append(  ['最新影视站', '有效', 'http://www.zxysz.com/?s=' + quote(real_movie_name)  ])
+                    self.add_tree(list, self.treeview_bt_download)
+
+
+
+                    break;
+
+        self.label_movie_rating_imdb.config(text='IMDB评分:' + rating_imdb + '分')
+
+
+
+    def project_statement_show(self, event):
+        webbrowser.open("https://github.com/shengqiangzhang/doubanMovieTool")
+
+    def project_statement_get_focus(self, event):
+        self.project_statement.config(fg="blue", cursor="hand1")
+
+    def project_statement_lose_focus(self, event):
+        self.project_statement.config(fg="#FF0000")
+
+
     def show_movie_data(self, event):
         '''
         显示某个被选择的电影的详情信息
         '''
 
         # self.hidden_GUI_movie_detail()
+
+        self.B_0_imdb['state'] = tkinter.NORMAL
+        self.label_movie_rating_imdb.config(text = 'IMDB评分')
+        self.clear_tree(self.treeview_play_online)
+        self.clear_tree(self.treeview_save_cloud_disk)
+        self.clear_tree(self.treeview_bt_download)
+
         item = self.treeview.selection()
         if(item):
             item_text = self.treeview.item(item, "values")
@@ -141,7 +305,7 @@ class uiObject:
                     self.label_movie_rating.config(text=str(movie['rating'][0]) + '分 ' + str(movie['vote_count']) + '人评价')
                     self.label_movie_time.config(text=movie['release_date'])
                     self.label_movie_type.config(text=movie['types'])
-                    print(movie)
+
                     break
 
         # self.show_GUI_movie_detail()
@@ -158,7 +322,7 @@ class uiObject:
         :return:
         '''
         img_open = Image.open(file_name) #读取本地图片
-        pil_image_resized = resize(160, 200, img_open) #等比例缩放本地图片
+        pil_image_resized = resize(160, 230, img_open) #等比例缩放本地图片
         img = ImageTk.PhotoImage(pil_image_resized) #读入图片
         self.label_img.config(image=img, width = pil_image_resized.size[0], height = pil_image_resized.size[1])
         self.label_img.image = img
@@ -244,6 +408,9 @@ class uiObject:
 
 
 
+    def keyboard_T_vote_keyword(self, event):
+        thread_it(self.searh_movie_in_keyword)
+
     def searh_movie_in_keyword(self):
         """
         从关键字中搜索符合条件的影片信息
@@ -281,6 +448,62 @@ class uiObject:
         self.B_0_keyword['text'] = '从关键字搜索'
 
 
+
+    def open_in_browser_douban_url(self, event):
+        """
+        从浏览器中打开指定网页
+        :param
+        :return:
+        """
+        item = self.treeview.selection()
+        if(item):
+            item_text = self.treeview.item(item, "values")
+            movieName = item_text[0]
+            for movie in self.jsonData:
+                if(movie['title'] == movieName):
+                    webbrowser.open(movie['url'])
+
+
+    def open_in_browser(self, event):
+        """
+        从浏览器中打开指定网页
+        :param
+        :return:
+        """
+        item = self.treeview_play_online.selection()
+        if(item):
+            item_text = self.treeview_play_online.item(item, "values")
+            url = item_text[2]
+            webbrowser.open(url)
+
+
+    def open_in_browser_cloud_disk(self, event):
+        """
+        从浏览器中打开指定网页
+        :param
+        :return:
+        """
+        item = self.treeview_save_cloud_disk.selection()
+        if(item):
+            item_text = self.treeview_save_cloud_disk.item(item, "values")
+            url = item_text[2]
+            webbrowser.open(url)
+
+
+
+    def open_in_browser_bt_download(self, event):
+        """
+        从浏览器中打开指定网页
+        :param
+        :return:
+        """
+        item = self.treeview_bt_download.selection()
+        if(item):
+            item_text = self.treeview_bt_download.item(item, "values")
+            url = item_text[2]
+            webbrowser.open(url)
+
+
     def ui_process(self):
         """
         Ui主程序
@@ -291,7 +514,7 @@ class uiObject:
         self.root = root
         # 设置窗口位置
         root.title("豆瓣")
-        self.center_window(root, 1000, 560)
+        self.center_window(root, 1000, 565)
         root.resizable(0, 0)  # 框体大小可调性，分别表示x,y方向的可变性
 
 
@@ -475,6 +698,18 @@ class uiObject:
         label_img.place(x=0,y=0) #布局
         self.label_img = label_img
 
+        # IMDB评分
+        ft_rating_imdb = font.Font(weight=font.BOLD)
+        label_movie_rating_imdb = Label(frame_left_movie_detail, text="IMDB评分", fg='#7F00FF', font=ft_rating_imdb, anchor=NW)
+        label_movie_rating_imdb.place(x=0, y=250)
+        self.label_movie_rating_imdb = label_movie_rating_imdb
+
+        # 查询按钮
+        B_0_imdb = Button(frame_left_movie_detail, text="初始化")
+        B_0_imdb.place(x=115, y=250)
+        self.B_0_imdb = B_0_imdb
+
+
         #影片名字
         ft = font.Font(size=15, weight=font.BOLD)
         label_movie_name = Label(frame_right_movie_detail, text="影片名字", fg='#FF0000', font=ft,anchor=NW)
@@ -512,10 +747,170 @@ class uiObject:
 
 
 
+
+
+        # 在线播放布局开始
+
+        labelframe_movie_play_online = LabelFrame(root, width=324, height=230, text="在线观看")
+        labelframe_movie_play_online.place(x=5, y=305)
+        self.labelframe_movie_play_online = labelframe_movie_play_online
+
+        # 框架布局，承载多个控件
+        frame_root_play_online = Frame(labelframe_movie_play_online, width=324)
+        frame_l_play_online = Frame(frame_root_play_online)
+        frame_r_play_online = Frame(frame_root_play_online)
+        self.frame_root_play_online = frame_root_play_online
+        self.frame_l_play_online = frame_l_play_online
+        self.frame_r_play_online = frame_r_play_online
+
+        # 表格
+        columns_play_online = ("来源名称", "是否免费","播放地址")
+        treeview_play_online = ttk.Treeview(frame_l_play_online, height=10, show="headings", columns=columns_play_online)
+        treeview_play_online.column("来源名称", width=90, anchor='center')
+        treeview_play_online.column("是否免费", width=80, anchor='center')
+        treeview_play_online.column("播放地址", width=120, anchor='center')
+        treeview_play_online.heading("来源名称", text="来源名称")
+        treeview_play_online.heading("是否免费", text="是否免费")
+        treeview_play_online.heading("播放地址", text="播放地址")
+
+        #垂直滚动条
+        vbar_play_online = ttk.Scrollbar(frame_r_play_online, command=treeview_play_online.yview)
+        treeview_play_online.configure(yscrollcommand=vbar_play_online.set)
+
+        treeview_play_online.pack()
+        self.treeview_play_online = treeview_play_online
+        vbar_play_online.pack(side=RIGHT, fill=Y)
+        self.vbar_play_online = vbar_play_online
+
+        # 框架的位置布局
+        frame_l_play_online.grid(row=0, column=0, sticky=NSEW)
+        frame_r_play_online.grid(row=0, column=1, sticky=NS)
+        frame_root_play_online.place(x=5, y=0)
+
+        # 在线播放布局结束
+
+
+
+
+
+
+
+
+
+
+        # 保存到云盘布局开始
+
+        labelframe_movie_save_cloud_disk = LabelFrame(root, width=324, height=230, text="云盘搜索")
+        labelframe_movie_save_cloud_disk.place(x=340, y=305)
+        self.labelframe_movie_save_cloud_disk = labelframe_movie_save_cloud_disk
+
+        # 框架布局，承载多个控件
+        frame_root_save_cloud_disk = Frame(labelframe_movie_save_cloud_disk, width=324)
+        frame_l_save_cloud_disk = Frame(frame_root_save_cloud_disk)
+        frame_r_save_cloud_disk = Frame(frame_root_save_cloud_disk)
+        self.frame_root_save_cloud_disk = frame_root_save_cloud_disk
+        self.frame_l_save_cloud_disk = frame_l_save_cloud_disk
+        self.frame_r_save_cloud_disk = frame_r_save_cloud_disk
+
+        # 表格
+        columns_save_cloud_disk = ("来源名称", "是否有效","播放地址")
+        treeview_save_cloud_disk = ttk.Treeview(frame_l_save_cloud_disk, height=10, show="headings", columns=columns_save_cloud_disk)
+        treeview_save_cloud_disk.column("来源名称", width=90, anchor='center')
+        treeview_save_cloud_disk.column("是否有效", width=80, anchor='center')
+        treeview_save_cloud_disk.column("播放地址", width=120, anchor='center')
+        treeview_save_cloud_disk.heading("来源名称", text="来源名称")
+        treeview_save_cloud_disk.heading("是否有效", text="是否有效")
+        treeview_save_cloud_disk.heading("播放地址", text="播放地址")
+
+        #垂直滚动条
+        vbar_save_cloud_disk = ttk.Scrollbar(frame_r_save_cloud_disk, command=treeview_save_cloud_disk.yview)
+        treeview_save_cloud_disk.configure(yscrollcommand=vbar_save_cloud_disk.set)
+
+        treeview_save_cloud_disk.pack()
+        self.treeview_save_cloud_disk = treeview_save_cloud_disk
+        vbar_save_cloud_disk.pack(side=RIGHT, fill=Y)
+        self.vbar_save_cloud_disk = vbar_save_cloud_disk
+
+        # 框架的位置布局
+        frame_l_save_cloud_disk.grid(row=0, column=0, sticky=NSEW)
+        frame_r_save_cloud_disk.grid(row=0, column=1, sticky=NS)
+        frame_root_save_cloud_disk.place(x=5, y=0)
+
+        # 保存到云盘布局结束
+
+
+
+
+
+
+
+
+
+        # BT下载布局开始
+
+        labelframe_movie_bt_download = LabelFrame(root, width=324, height=230, text="影视下载")
+        labelframe_movie_bt_download.place(x=670, y=305)
+        self.labelframe_movie_bt_download = labelframe_movie_bt_download
+
+        # 框架布局，承载多个控件
+        frame_root_bt_download = Frame(labelframe_movie_bt_download, width=324)
+        frame_l_bt_download = Frame(frame_root_bt_download)
+        frame_r_bt_download = Frame(frame_root_bt_download)
+        self.frame_root_bt_download = frame_root_bt_download
+        self.frame_l_bt_download = frame_l_bt_download
+        self.frame_r_bt_download = frame_r_bt_download
+
+        # 表格
+        columns_bt_download = ("来源名称", "是否有效","播放地址")
+        treeview_bt_download = ttk.Treeview(frame_l_bt_download, height=10, show="headings", columns=columns_bt_download)
+        treeview_bt_download.column("来源名称", width=90, anchor='center')
+        treeview_bt_download.column("是否有效", width=80, anchor='center')
+        treeview_bt_download.column("播放地址", width=120, anchor='center')
+        treeview_bt_download.heading("来源名称", text="来源名称")
+        treeview_bt_download.heading("是否有效", text="是否有效")
+        treeview_bt_download.heading("播放地址", text="播放地址")
+
+        #垂直滚动条
+        vbar_bt_download = ttk.Scrollbar(frame_r_bt_download, command=treeview_bt_download.yview)
+        treeview_bt_download.configure(yscrollcommand=vbar_bt_download.set)
+
+        treeview_bt_download.pack()
+        self.treeview_bt_download = treeview_bt_download
+        vbar_bt_download.pack(side=RIGHT, fill=Y)
+        self.vbar_bt_download = vbar_bt_download
+
+        # 框架的位置布局
+        frame_l_bt_download.grid(row=0, column=0, sticky=NSEW)
+        frame_r_bt_download.grid(row=0, column=1, sticky=NS)
+        frame_root_bt_download.place(x=5, y=0)
+
+        # BT下载布局结束
+
+
+
+
+
+        #项目的一些信息
+        ft = font.Font(size=14, weight=font.BOLD)
+        project_statement = Label(root, text="GitHub: https://github.com/shengqiangzhang/doubanMovieTool                                                开源项目, 仅用于学习交流, 请在法律允许范围内使用", fg='#FF0000', font=ft,anchor=NW)
+        project_statement.place(x=5, y=540)
+        self.project_statement = project_statement
+
+
+
         #绑定事件
         treeview.bind('<<TreeviewSelect>>', self.show_movie_data)  # 表格绑定选择事件
+        treeview.bind('<Double-1>', self.open_in_browser_douban_url)  # 表格绑定鼠标左键事件
+        treeview_play_online.bind('<Double-1>', self.open_in_browser)  # 表格绑定左键双击事件
+        treeview_save_cloud_disk.bind('<Double-1>', self.open_in_browser_cloud_disk)  # 表格绑定左键双击事件
+        treeview_bt_download.bind('<Double-1>', self.open_in_browser_bt_download)  # 表格绑定左键双击事件
         B_0.configure(command=lambda:thread_it(self.searh_movie_in_rating)) #按钮绑定单击事件
         B_0_keyword.configure(command=lambda:thread_it(self.searh_movie_in_keyword)) #按钮绑定单击事件
+        B_0_imdb.configure(command=lambda: thread_it(self.show_IDMB_rating))  # 按钮绑定单击事件
+        T_vote_keyword.bind('<Return>', handlerAdaptor(self.keyboard_T_vote_keyword))  # 文本框绑定选择事件
+        project_statement.bind('<ButtonPress-1>', self.project_statement_show)  # 标签绑定鼠标单击事件
+        project_statement.bind('<Enter>', self.project_statement_get_focus)  # 标签绑定获得焦点事件
+        project_statement.bind('<Leave>', self.project_statement_lose_focus)  # 标签绑定失去焦点事件
 
 
 

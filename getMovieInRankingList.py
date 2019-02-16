@@ -66,7 +66,8 @@ class getMovieInRankingList:
     def get_url_data_in_ranking_list(self, typeId, movie_count, rating, vote_count):
         context = ssl._create_unverified_context() #ssl
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-                      "Cookie":"bid=GOT4pCp9nDo; douban-fav-remind=1; ll=\"118281\"; _vwo_uuid_v2=D66FD66C128357F50256AF7D1640C2C4E|cfa1775f07bb9e7b103867cca686f90f; ct=y; push_noty_num=0; push_doumail_num=0; __utmv=30149280.17530; ps=y; dbcl2=\"175306983:IdbYxDP86ig\"; gr_user_id=114cc107-0ac5-4673-b200-31dd9a75055f; __yadk_uid=XB4UiG1j51gcqU0eP9Kixoh7Md13Iuh3; ck=C2_e; __utmc=30149280; __utmc=223695111; __utmz=223695111.1548048334.17.5.utmcsr=baidu|utmccn=(organic)|utmcmd=organic; __utma=30149280.1293355995.1546000996.1548232182.1548236480.32; __utmz=30149280.1548236480.32.16.utmcsr=sec.douban.com|utmccn=(referral)|utmcmd=referral|utmcct=/a; _pk_ref.100001.4cf6=%5B%22%22%2C%22%22%2C1548236776%2C%22https%3A%2F%2Fwww.baidu.com%2Flink%3Furl%3DamwH-XLMWrZif3MaPJ9II4CtZIM6A0xUPdB8UQKMadjqHZApcjKbViUzRtAqqYVRHkXKXw9YmL7INCYr3D4ONa%26wd%3D%26eqid%3Daafd0df100043c14000000065c4557c7%22%5D; _pk_id.100001.4cf6=a5fe3116fc29e5fa.1546939070.23.1548236776.1548232454.; __utma=223695111.1446768112.1546939070.1548232182.1548236776.21"}
+                    "Cookie":"bid=GOT4pCp9nDo; douban-fav-remind=1; ll=\"118281\"; _vwo_uuid_v2=D66FD66C128357F50256AF7D1640C2C4E|cfa1775f07bb9e7b103867cca686f90f; ct=y; push_noty_num=0; push_doumail_num=0; __utmv=30149280.17530; ps=y; gr_user_id=114cc107-0ac5-4673-b200-31dd9a75055f; __yadk_uid=XB4UiG1j51gcqU0eP9Kixoh7Md13Iuh3; __utmz=30149280.1548260586.36.17.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); __utmz=223695111.1548260586.24.6.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); __utmc=30149280; __utmc=223695111; _pk_ref.100001.4cf6=%5B%22%22%2C%22%22%2C1548695792%2C%22https%3A%2F%2Fwww.douban.com%2Fsearch%3Fq%3D%25E9%2580%259F%25E5%25BA%25A6%25E4%25B8%258E%25E6%25BF%2580%25E6%2583%2585%22%5D; _pk_ses.100001.4cf6=*; ap_v=0,6.0; __utma=30149280.1293355995.1546000996.1548664862.1548696797.44; __utmb=30149280.0.10.1548696797; __utma=223695111.1446768112.1546939070.1548664862.1548696797.29; __utmb=223695111.0.10.1548696797; dbcl2=\"175306983:wFDRFDTa1iY\"; ck=qgH3; _pk_id.100001.4cf6=a5fe3116fc29e5fa.1546939070.41.1548698529.1548666571."
+                  }
         url = 'https://movie.douban.com/j/chart/top_list?type=' + str(typeId) + '&interval_id=100:90&action=unwatched&start=0&limit=' + str(movie_count)
         req = urllib.request.Request(url=url, headers=headers)
         f = urllib.request.urlopen(req, context=context)
@@ -95,6 +96,7 @@ class getMovieInRankingList:
         # 注意selenium必须安装2.x版本,否则报错,新版selenium已经放弃phantomjs
         # phantomjs:一款无界面的浏览器内核，下载方式http://phantomjs.org/download.html
         # 此方式优点:可爬取js动态渲染后的数据,缺点:速度较低,效率一般
+
 
         service_args = []
         service_args.append('--load-images=no') # 关闭图片加载
